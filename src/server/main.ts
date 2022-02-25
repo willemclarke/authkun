@@ -3,6 +3,8 @@ import cors from 'cors';
 import bodyParser from 'body-parser';
 import { createPool } from 'slonik';
 import { Config, fromEnv } from '../common/config';
+import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
 
 const config: Config = fromEnv();
 
@@ -14,8 +16,7 @@ app.use(bodyParser.json());
 
 (async () => {
   const pool = createPool(config.databaseUrl, { ssl: { rejectUnauthorized: false } });
-  console.log({ pool });
-
+  console.log(crypto.randomBytes(20).toString('hex'));
   /**
    * Placeholder `/` home route
    */
@@ -26,7 +27,10 @@ app.use(bodyParser.json());
   /**
    * `/register` will be route which recieves a `username` and `password` from the front end
    */
-  app.post('/register', async (req, res) => {});
+  app.post('/register', async (req, res) => {
+    // const username = req.params.username;
+    // const password = req.params.password;
+  });
 
   /**
    * `/login` will be a route which recieves a `username` and `password` and checks if it already exists

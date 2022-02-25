@@ -4,6 +4,7 @@ config();
 
 export interface Config {
   databaseUrl: string;
+  authSecret: string;
 }
 
 export const getEnv = (value: string) => {
@@ -18,5 +19,6 @@ export const getEnv = (value: string) => {
 export const fromEnv = (): Config => {
   return {
     databaseUrl: getEnv('DATABASE_URL'),
+    authSecret: getEnv('AUTH_SECRET'),
   };
 };
