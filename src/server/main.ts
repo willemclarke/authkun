@@ -2,21 +2,22 @@ import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import { createPool } from 'slonik';
-import { Config, fromEnv } from '../common/config';
+import { Config, fromEnv } from './config';
 import jwt from 'jsonwebtoken';
-import crypto from 'crypto';
+import { Database } from './database/Database';
 
 const config: Config = fromEnv();
 
 const app = express();
 const PORT = 8080;
 
-app.use(cors({ origin: 'http://localhost:8081' }));
+app.use(cors());
 app.use(bodyParser.json());
 
 (async () => {
-  const pool = createPool(config.databaseUrl, { ssl: { rejectUnauthorized: false } });
-  console.log(crypto.randomBytes(20).toString('hex'));
+  const pool = createPool(config.databaseUrl);
+  const database = new Database(pool);
+
   /**
    * Placeholder `/` home route
    */
@@ -28,8 +29,12 @@ app.use(bodyParser.json());
    * `/register` will be route which recieves a `username` and `password` from the front end
    */
   app.post('/register', async (req, res) => {
-    // const username = req.params.username;
-    // const password = req.params.password;
+    const username = req.body.username;
+    const password = req.body.password;
+
+    database.insertUser({ username, password });
+
+    res.send({ username, password });
   });
 
   /**

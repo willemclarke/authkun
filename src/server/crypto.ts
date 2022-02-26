@@ -5,9 +5,13 @@ interface Password {
   hashedPassword: string;
 }
 
-export const hashAndSaltPassword = (password: string): Password => {
+const hashPassword = (password: string, salt: string): string => {
+  return crypto.pbkdf2Sync(password, salt, 1000, 64, 'sha512').toString('hex');
+};
+
+export const hashAndSaltUserPassword = (password: string): Password => {
   const salt = crypto.randomBytes(20).toString('hex');
-  const hashedPassword = crypto.pbkdf2Sync(password, salt, 1000, 64, 'sha512').toString('hex');
+  const hashedPassword = hashPassword(password, salt);
 
   return {
     salt,
@@ -20,8 +24,5 @@ export const verifyPassword = (
   salt: string,
   hashedPassword: string
 ): boolean => {
-  return (
-    crypto.pbkdf2Sync(plainTextPassword, salt, 1000, 64, 'sha512').toString('hex') ===
-    hashedPassword
-  );
+  return hashPassword(plainTextPassword, salt) === hashedPassword;
 };
