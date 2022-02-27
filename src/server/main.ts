@@ -5,6 +5,7 @@ import { createPool } from 'slonik';
 import { Config, fromEnv } from './config/config';
 import jwt from 'jsonwebtoken';
 import { Database } from './database/Database';
+import { createJwt } from './crypto';
 
 const config: Config = fromEnv();
 
@@ -31,7 +32,7 @@ app.post('/register', async (req, res) => {
     return res.status(200).json(`Username ${username} already exists`);
   }
 
-  const jwt_ = jwt.sign({ writeUser }, config.authSecret, { expiresIn: '10h' });
+  const jwt_ = createJwt(writeUser, config.authSecret);
   return res.status(200).send(jwt_);
 });
 
@@ -45,7 +46,7 @@ app.post('/login', async (req, res) => {
     return res.status(200).send(`Incorrect password, please try again`);
   }
 
-  const jwt_ = jwt.sign({ user }, config.authSecret, { expiresIn: '10h' });
+  const jwt_ = createJwt(user, config.authSecret);
   return res.status(200).send(jwt_);
 });
 

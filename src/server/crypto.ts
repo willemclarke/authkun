@@ -1,9 +1,13 @@
 import crypto from 'crypto';
+import jwt from 'jsonwebtoken';
 
 interface Password {
   salt: string;
   hashedPassword: string;
 }
+
+export const createJwt = (payload: any, token: string) =>
+  jwt.sign({ payload }, token, { expiresIn: '10h' });
 
 const createSalt = () => crypto.randomBytes(20).toString('hex');
 
