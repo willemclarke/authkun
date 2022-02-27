@@ -1,0 +1,1 @@
+- Lil project to gain a more thorough insight into jwt authentication with my own implementation.

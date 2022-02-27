@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import { createPool } from 'slonik';
-import { Config, fromEnv } from './config';
+import { Config, fromEnv } from './config/config';
 import jwt from 'jsonwebtoken';
 import { Database } from './database/Database';
 
@@ -14,33 +14,39 @@ const PORT = 8080;
 app.use(cors());
 app.use(bodyParser.json());
 
-(async () => {
-  const pool = createPool(config.databaseUrl);
-  const database = new Database(pool);
+const pool = createPool(config.databaseUrl);
+const database = new Database(pool);
 
-  /**
-   * Placeholder `/` home route
-   */
-  app.get('/', (req, res) => {
-    res.status(200).send('Welcome sire');
-  });
+app.get('/', (req, res) => {
+  res.status(200).send('Welcome sire');
+});
 
-  /**
-   * `/register` will be route which recieves a `username` and `password` from the front end
-   */
-  app.post('/register', async (req, res) => {
-    const username = req.body.username;
-    const password = req.body.password;
+app.post('/register', async (req, res) => {
+  const username = req.body.username;
+  const password = req.body.password;
 
-    database.insertUser({ username, password });
+  const writeUser = await database.writeUser({ username, password });
 
-    res.send({ username, password });
-  });
+  if (!writeUser) {
+    return res.status(200).json(`Username ${username} already exists`);
+  }
 
-  /**
-   * `/login` will be a route which recieves a `username` and `password` and checks if it already exists
-   */
-  app.post('/login', (req, res) => {});
+  const jwt_ = jwt.sign({ writeUser }, config.authSecret, { expiresIn: '10h' });
+  return res.status(200).send(jwt_);
+});
 
-  app.listen(PORT, () => console.log(`App listening on Port: ${PORT}`));
-})();
+app.post('/login', async (req, res) => {
+  const username = req.body.username;
+  const password = req.body.password;
+
+  const user = await database.verifyUserForLogin({ username, password });
+
+  if (!user) {
+    return res.status(200).send(`Incorrect password, please try again`);
+  }
+
+  const jwt_ = jwt.sign({ user }, config.authSecret, { expiresIn: '10h' });
+  return res.status(200).send(jwt_);
+});
+
+app.listen(PORT, () => console.log(`App listening on Port: ${PORT}`));
