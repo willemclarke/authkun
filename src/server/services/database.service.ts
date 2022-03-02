@@ -1,10 +1,8 @@
 import { DatabasePool, sql, QueryResult } from 'slonik';
-import { v4 as uuidv4 } from 'uuid';
 import { dateTimeAsTimestamp } from './utils';
-import { hashAndSaltUserPassword, verifyPassword } from '../crypto';
 import _ from 'lodash';
 
-export interface User {
+export interface DatabaseUser {
   id: string;
   username: string;
   password: string;
@@ -19,9 +17,11 @@ export class DatabaseService {
     this.pool = pool;
   }
 
-  async getUser(username: string): Promise<User | null> {
+  async getUser(username: string): Promise<DatabaseUser | null> {
     return this.pool.connect((connection) => {
-      return connection.maybeOne<User>(sql`SELECT * FROM users WHERE username = ${username}`);
+      return connection.maybeOne<DatabaseUser>(
+        sql`SELECT * FROM users WHERE username = ${username}`
+      );
     });
   }
 
@@ -31,39 +31,15 @@ export class DatabaseService {
     });
   }
 
-  // this now needs to take in a `User` and simply write that user to db
-  // thus it needs to take in a uuid, hashedPw etc
-  // checking if the user exists needs to happen in the user service
-  async writeUser(user: User): Promise<QueryResult<User> | null> {
-    const { salt, hashedPassword } = hashAndSaltUserPassword(user.password);
-
-    const createdAt = dateTimeAsTimestamp(new Date());
-
-    if (await this.userExists(user.username)) {
-      return null;
-    }
+  async writeUser(user: DatabaseUser): Promise<QueryResult<DatabaseUser>> {
+    const { id, username, password, salt, createdAt } = user;
 
     return this.pool.connect((connection) => {
-      return connection.query<User>(
-        sql`INSERT INTO users (id, username, password, salt, created_at) VALUES (${uuidv4()}, ${
-          user.username
-        }, ${hashedPassword}, ${salt}, ${createdAt})`
+      return connection.query<DatabaseUser>(
+        sql`INSERT INTO users (id, username, password, salt, created_at) VALUES (${id}, ${username}, ${password}, ${salt}, ${dateTimeAsTimestamp(
+          createdAt
+        )})`
       );
     });
   }
-
-  // simplify to only interact with database (database.service)
-  // this should probably return true or false
-  // async verifyUserForLogin(username: string, password: string): Promise<DatabaseUser | null> {
-  //   if (await this.userExists(username)) {
-  //     const user = await this.getUser(username);
-  //     const validPassword = verifyPassword(password, user?.salt, user?.password);
-
-  //     if (!validPassword) {
-  //       return null;
-  //     }
-  //     return user;
-  //   }
-  //   return null;
-  // }
 }
