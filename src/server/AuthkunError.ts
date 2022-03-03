@@ -2,27 +2,28 @@ export enum AuthkunErrorType {
   UserAlreadyExists = 'UserAlreadyExists',
   Unauthorised = 'Unauthorised',
   InternalServerError = 'InternalServerError',
+  UnknownErrorOccured = 'UnknownErrorOccured',
 }
 
 export class AuthkunError extends Error {
   type: AuthkunErrorType;
   status: number;
-  metadata: any;
+  message: string;
 
-  constructor(type: AuthkunErrorType, metadata: any) {
+  constructor({ type, message }: { type: AuthkunErrorType; message: string }) {
     super();
     this.type = type;
-    this.status = this.ErrorTypeToStatusCode(this.type);
-    this.metadata = metadata;
+    this.status = AuthkunError.ErrorTypeToStatusCode(this.type);
+    this.message = message;
   }
 
-  private ErrorTypeToStatusCode(type: AuthkunErrorType): number {
+  private static ErrorTypeToStatusCode(type: AuthkunErrorType): number {
     switch (type) {
-      case AuthkunErrorType.InternalServerError:
-        return 500;
       case AuthkunErrorType.UserAlreadyExists:
         return 403;
+      case AuthkunErrorType.InternalServerError:
       case AuthkunErrorType.Unauthorised:
+      case AuthkunErrorType.UnknownErrorOccured:
         return 500;
     }
   }
