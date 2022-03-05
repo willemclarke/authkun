@@ -1,5 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
-import { AuthkunError, AuthkunErrorType } from '../AuthkunError';
+import { AuthkunError, AuthkunErrorType, errorTypeToStatusCode } from '../AuthkunError';
+
+const isAuthkunError = (error: Error | AuthkunError) => error instanceof AuthkunError;
 
 export const errorMiddleware = (
   error: Error | AuthkunError,
@@ -7,14 +9,13 @@ export const errorMiddleware = (
   res: Response,
   next: NextFunction
 ) => {
-  let authkunError = error;
-
-  if (!(error instanceof AuthkunError)) {
-    authkunError = new AuthkunError({
-      type: AuthkunErrorType.UnknownErrorOccured,
-      message: authkunError.message,
+  if (!isAuthkunError(error)) {
+    error = new AuthkunError({
+      type: AuthkunErrorType.InternalServerError,
+      message: error.message,
     });
-
-    res.status((authkunError as AuthkunError).status).send(authkunError);
   }
+
+  const status = errorTypeToStatusCode((error as AuthkunError).type);
+  res.status(status).send(error);
 };

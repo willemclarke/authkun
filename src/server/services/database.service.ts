@@ -10,6 +10,13 @@ export interface DatabaseUser {
   createdAt: Date;
 }
 
+export interface ClientUser {
+  id: string;
+  username: string;
+  password: string;
+  createdAt: string;
+}
+
 export class DatabaseService {
   pool: DatabasePool;
 
@@ -21,6 +28,14 @@ export class DatabaseService {
     return this.pool.connect((connection) => {
       return connection.maybeOne<DatabaseUser>(
         sql`SELECT * FROM users WHERE username = ${username}`
+      );
+    });
+  }
+
+  async getPartialUser(username: string): Promise<ClientUser | null> {
+    return this.pool.connect((connection) => {
+      return connection.maybeOne<ClientUser>(
+        sql`SELECT (id, username, password, created_at) FROM users WHERE username = ${username}`
       );
     });
   }

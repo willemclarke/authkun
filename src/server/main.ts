@@ -23,14 +23,20 @@ app.get('/', (req, res) => {
   res.status(200).send('Welcome sire');
 });
 
-//TODO: currently getting socket hangup error when posting from postman to `/register`, find fix
-app.post('/register', async (req, res) => {
-  const { username, password } = req.body;
+//TODO: work out way to make this more legit, (userJwtPayload)
+app.post('/register', async (req, res, next) => {
+  try {
+    const { username, password } = req.body;
 
-  const registerUser = await userService.register(username, password);
-  const jwt_ = createJwt({ registerUser }, config.authSecret);
+    const registerUser = await userService.register(username, password);
+    const userJwtPayload = await userService.getUserForJWT(username);
+    console.log({ userJwtPayload });
+    const jwt_ = createJwt({ userJwtPayload }, config.authSecret);
 
-  res.status(200).json(jwt_);
+    res.status(200).json(jwt_);
+  } catch (error) {
+    next(error);
+  }
 });
 
 app.post('/login', async (req, res) => {
