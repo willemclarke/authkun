@@ -3,6 +3,7 @@ export enum AuthkunErrorType {
   Unauthorised = 'Unauthorised',
   InternalServerError = 'InternalServerError',
   UnknownErrorOccured = 'UnknownErrorOccured',
+  InvalidUserLogin = 'InvalidUserLogin',
 }
 
 export class AuthkunError extends Error {
@@ -19,6 +20,8 @@ export class AuthkunError extends Error {
 export const errorTypeToStatusCode = (type: AuthkunErrorType) => {
   switch (type) {
     case AuthkunErrorType.UserAlreadyExists:
+      return 409;
+    case AuthkunErrorType.InvalidUserLogin:
       return 403;
     case AuthkunErrorType.InternalServerError:
     case AuthkunErrorType.Unauthorised:

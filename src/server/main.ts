@@ -7,9 +7,11 @@ import { DatabaseService } from './services/database.service';
 import { UserService } from './services/user.service';
 import { createJwt } from './crypto';
 import { errorMiddleware } from './middleware/error.middleware';
+import { AuthkunError, AuthkunErrorType } from './AuthkunError';
 
 const app = express();
 const config: Config = fromEnv();
+
 const PORT = 8080;
 
 const pool = createPool(config.databaseUrl);
@@ -23,14 +25,16 @@ app.get('/', (req, res) => {
   res.status(200).send('Welcome sire');
 });
 
-//TODO: work out way to make this more legit, (userJwtPayload)
+/**
+ * Contents for JWT:
+ * `username`, `id`, `expiry`, `issuer`
+ */
 app.post('/register', async (req, res, next) => {
   try {
     const { username, password } = req.body;
 
-    const registerUser = await userService.register(username, password);
+    userService.register(username, password);
     const userJwtPayload = await userService.getUserForJWT(username);
-    console.log({ userJwtPayload });
     const jwt_ = createJwt({ userJwtPayload }, config.authSecret);
 
     res.status(200).json(jwt_);
@@ -39,18 +43,26 @@ app.post('/register', async (req, res, next) => {
   }
 });
 
-app.post('/login', async (req, res) => {
-  const { username, password } = req.body;
-  const isValidUser = await userService.verifyUserCredentials(username, password);
+app.post('/login', async (req, res, next) => {
+  try {
+    const { username, password } = req.body;
+    const isValidUser = await userService.verifyUserCredentials(username, password);
 
-  if (isValidUser) {
-    const user = userService.getUser(username);
-    const jwt_ = createJwt({ user }, config.authSecret);
+    if (!isValidUser) {
+      throw new AuthkunError({
+        type: AuthkunErrorType.InvalidUserLogin,
+        message: `Failed to login user: ${username}. Ensure username and password are correct`,
+      });
+    }
+
+    const userJwtPayload = userService.getUserForJWT(username);
+    const jwt_ = createJwt({ userJwtPayload }, config.authSecret);
+
     return res.status(200).json(jwt_);
+  } catch (error) {
+    next(error);
   }
-  return res.status(200).json(`Invalid username`);
 });
 
 app.use(errorMiddleware);
-
 app.listen(PORT, () => console.log(`App listening on Port: ${PORT}`));

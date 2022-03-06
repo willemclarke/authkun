@@ -1,9 +1,8 @@
 import { hashAndSaltUserPassword, verifyPassword } from '../crypto';
-import { ClientUser, DatabaseService, DatabaseUser } from './database.service';
+import { PartialUser, DatabaseService, DatabaseUser } from './database.service';
 import { v4 as uuidv4 } from 'uuid';
 import _ from 'lodash';
 import { AuthkunError, AuthkunErrorType } from '../AuthkunError';
-import { QueryResult } from 'slonik';
 
 export class UserService {
   DatabaseService: DatabaseService;
@@ -12,7 +11,7 @@ export class UserService {
     this.DatabaseService = databaseService;
   }
 
-  async getUserForJWT(username: string): Promise<ClientUser | null> {
+  async getUserForJWT(username: string): Promise<PartialUser | null> {
     return this.DatabaseService.getPartialUser(username);
   }
 
@@ -20,7 +19,7 @@ export class UserService {
     return this.DatabaseService.getUser(username);
   }
 
-  async register(username: string, password: string): Promise<QueryResult<DatabaseUser>> {
+  async register(username: string, password: string): Promise<void> {
     const { salt, hashedPassword } = hashAndSaltUserPassword(password);
     const createdAt = new Date();
     const userExists = await this.DatabaseService.userExists(username);
@@ -32,7 +31,7 @@ export class UserService {
       });
     }
 
-    return this.DatabaseService.writeUser({
+    this.DatabaseService.writeUser({
       id: uuidv4(),
       username,
       password: hashedPassword,
@@ -55,6 +54,4 @@ export class UserService {
 
     return verifyPassword(password, user.salt, user.password);
   }
-
-  async login(username: string, password: string) {}
 }

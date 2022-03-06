@@ -7,7 +7,7 @@ interface Password {
 }
 
 export const createJwt = (payload: any, token: string) => {
-  return jwt.sign({ payload }, token, { expiresIn: '10h' });
+  return jwt.sign({ payload }, token, { expiresIn: '16h' });
 };
 
 const createSalt = () => crypto.randomBytes(20).toString('hex');
