@@ -13,9 +13,10 @@ export interface DatabaseUser {
 export interface PartialUser {
   id: string;
   username: string;
-  createdAt: string;
 }
 
+// TODO:
+// Setup a `transaction` for database, so each db query will innately handle any errors that occur
 export class DatabaseService {
   pool: DatabasePool;
 
@@ -34,7 +35,7 @@ export class DatabaseService {
   async getPartialUser(username: string): Promise<PartialUser | null> {
     return this.pool.connect((connection) => {
       return connection.maybeOne<PartialUser>(
-        sql`SELECT (id, username, created_at) FROM users WHERE username = ${username}`
+        sql`SELECT id, username FROM users WHERE username = ${username}`
       );
     });
   }

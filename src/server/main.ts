@@ -8,6 +8,7 @@ import { UserService } from './services/user.service';
 import { createJwt } from './crypto';
 import { errorMiddleware } from './middleware/error.middleware';
 import { AuthkunError, AuthkunErrorType } from './AuthkunError';
+import jwt from 'jsonwebtoken';
 
 const app = express();
 const config: Config = fromEnv();
@@ -29,13 +30,22 @@ app.get('/', (req, res) => {
  * Contents for JWT:
  * `username`, `id`, `expiry`, `issuer`
  */
+
 app.post('/register', async (req, res, next) => {
   try {
     const { username, password } = req.body;
 
-    userService.register(username, password);
+    await userService.register(username, password);
     const userJwtPayload = await userService.getUserForJWT(username);
-    const jwt_ = createJwt({ userJwtPayload }, config.authSecret);
+
+    if (!userJwtPayload) {
+      throw new AuthkunError({
+        type: AuthkunErrorType.NoRowFound,
+        message: `Error retrieving user: ${username}'s data from database`,
+      });
+    }
+
+    const jwt_ = createJwt(userJwtPayload, config.authSecret);
 
     res.status(200).json(jwt_);
   } catch (error) {
@@ -55,8 +65,16 @@ app.post('/login', async (req, res, next) => {
       });
     }
 
-    const userJwtPayload = userService.getUserForJWT(username);
-    const jwt_ = createJwt({ userJwtPayload }, config.authSecret);
+    const userJwtPayload = await userService.getUserForJWT(username);
+
+    if (!userJwtPayload) {
+      throw new AuthkunError({
+        type: AuthkunErrorType.NoRowFound,
+        message: `Error retrieving user: ${username}'s data from database`,
+      });
+    }
+
+    const jwt_ = createJwt(userJwtPayload, config.authSecret);
 
     return res.status(200).json(jwt_);
   } catch (error) {

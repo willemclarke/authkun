@@ -54,4 +54,6 @@ export class UserService {
 
     return verifyPassword(password, user.salt, user.password);
   }
+
+  async logout(username: string, password: string) {}
 }

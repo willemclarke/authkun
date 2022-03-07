@@ -1,15 +1,21 @@
 import crypto from 'crypto';
-import jwt from 'jsonwebtoken';
+import jwt, { Secret, SignOptions } from 'jsonwebtoken';
 
 interface Password {
   salt: string;
   hashedPassword: string;
 }
 
-export const createJwt = (payload: any, token: string) => {
-  return jwt.sign({ payload }, token, { expiresIn: '16h' });
+// jwt
+export const createJwt = (
+  payload: Parameters<typeof jwt.sign>[0],
+  token: Secret,
+  options?: SignOptions
+) => {
+  return jwt.sign(payload, token, { ...options, expiresIn: '16h' });
 };
 
+// cryptography
 const createSalt = () => crypto.randomBytes(20).toString('hex');
 
 const hashPassword = (password: string, salt: string): string => {
