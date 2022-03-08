@@ -8,7 +8,6 @@ import { UserService } from './services/user.service';
 import { createJwt } from './crypto';
 import { errorMiddleware } from './middleware/error.middleware';
 import { AuthkunError, AuthkunErrorType } from './AuthkunError';
-import jwt from 'jsonwebtoken';
 
 const app = express();
 const config: Config = fromEnv();
@@ -23,7 +22,7 @@ app.use(cors());
 app.use(bodyParser.json());
 
 app.get('/', (req, res) => {
-  res.status(200).send('Welcome sire');
+  res.status(200).send("Welcome sire, you're authenticated and can thus view this message");
 });
 
 /**
@@ -45,7 +44,7 @@ app.post('/register', async (req, res, next) => {
       });
     }
 
-    const jwt_ = createJwt(userJwtPayload, config.authSecret);
+    const jwt_ = createJwt({ userJwtPayload }, config.authSecret);
 
     res.status(200).json(jwt_);
   } catch (error) {
@@ -68,13 +67,14 @@ app.post('/login', async (req, res, next) => {
     const userJwtPayload = await userService.getUserForJWT(username);
 
     if (!userJwtPayload) {
+      // fix this error type, probs needs to be more generic since a row wasnt found, it doenst exist
       throw new AuthkunError({
         type: AuthkunErrorType.NoRowFound,
         message: `Error retrieving user: ${username}'s data from database`,
       });
     }
 
-    const jwt_ = createJwt(userJwtPayload, config.authSecret);
+    const jwt_ = createJwt({ userJwtPayload }, config.authSecret);
 
     return res.status(200).json(jwt_);
   } catch (error) {
