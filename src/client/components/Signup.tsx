@@ -2,8 +2,9 @@ import React from 'react';
 import { Button, Flex, FormControl, FormErrorMessage, FormLabel, Input } from '@chakra-ui/react';
 import { useForm } from 'react-hook-form';
 import { useSignupUser } from '../hooks/useSignupUser';
+import { useToast } from '../hooks/useToast';
 
-interface Inputs {
+interface FormValues {
   username: string;
   password: string;
 }
@@ -12,19 +13,26 @@ export const Signup = () => {
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors },
     setError,
-  } = useForm<Inputs>();
+  } = useForm<FormValues>();
+
   const signupUserMutation = useSignupUser();
+  const { successToast } = useToast();
 
   const onSubmit = React.useCallback(
-    (inputs: Inputs) => {
+    (values: FormValues) => {
       signupUserMutation
-        .mutateAsync({ ...inputs })
-        .then((res) => console.log(res))
+        .mutateAsync({ ...values })
+        .then((res) => {
+          successToast('Successfully signed up!');
+          console.log(res);
+        })
         .catch((err) => {
-          // capture and setError here in a way react-hook-form understands
-          console.log(err);
+          setError('username', {
+            type: err.response.data.type,
+            message: err.response.data.message,
+          });
         });
     },
     [signupUserMutation]
@@ -48,16 +56,29 @@ export const Signup = () => {
                 maxLength: { value: 15, message: 'Username cannot exceed 15 characters' },
               })}
             />
-            <FormErrorMessage overflowX="clip">
-              {errors.username && errors.username.message}
-            </FormErrorMessage>
+            <FormErrorMessage overflowX="clip">{errors.username?.message}</FormErrorMessage>
             <FormLabel my={1} htmlFor="password" fontWeight="bold">
               Password
             </FormLabel>
-            <Input my={1} id="password" placeholder="password" {...register('password')} />
-            <FormErrorMessage>{errors.password && errors.password.message}</FormErrorMessage>
+            <Input
+              my={1}
+              id="password"
+              placeholder="password"
+              {...register('password', {
+                required: true,
+                minLength: { value: 5, message: 'Password should be at least 5 characters long' },
+                maxLength: { value: 15, message: 'Password cannot exceed 20 characters' },
+              })}
+            />
+            <FormErrorMessage>{errors.password?.message}</FormErrorMessage>
           </FormControl>
-          <Button my={2} size="md" colorScheme="orange" type="submit" isLoading={isSubmitting}>
+          <Button
+            my={2}
+            size="md"
+            colorScheme="orange"
+            type="submit"
+            isLoading={signupUserMutation.isLoading}
+          >
             Sign up
           </Button>
         </Flex>

@@ -14,5 +14,5 @@ const postUser = async (variables: Variables): Promise<JWT> => {
 };
 
 export const useSignupUser = () => {
-  return useMutation(postUser);
+  return useMutation<JWT, Error, Variables>(postUser);
 };
