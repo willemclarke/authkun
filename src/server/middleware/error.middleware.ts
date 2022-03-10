@@ -17,5 +17,5 @@ export const errorMiddleware = (
   }
 
   const status = errorTypeToStatusCode((error as AuthkunError).type);
-  res.status(status).send(error);
+  res.status(status).json(error);
 };
