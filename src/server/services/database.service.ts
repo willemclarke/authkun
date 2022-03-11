@@ -40,6 +40,13 @@ export class DatabaseService {
     });
   }
 
+  async getUsers(): Promise<readonly PartialUser[]> {
+    return this.pool.connect(async (connection) => {
+      const { rows } = await connection.query<PartialUser>(sql`SELECT id, username FROM users`);
+      return rows;
+    });
+  }
+
   async userExists(username: string): Promise<boolean> {
     return this.pool.connect((connection) => {
       return connection.exists(sql`SELECT * FROM users WHERE username = ${username}`);

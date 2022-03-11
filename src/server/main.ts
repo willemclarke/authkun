@@ -7,6 +7,7 @@ import { DatabaseService } from './services/database.service';
 import { UserService } from './services/user.service';
 import { createJwt } from './crypto';
 import { errorMiddleware } from './middleware/error.middleware';
+import { authMiddleware } from './middleware/auth.middleware';
 import { AuthkunError, AuthkunErrorType } from './AuthkunError';
 
 const app = express();
@@ -21,14 +22,11 @@ const userService = new UserService(databaseService);
 app.use(cors());
 app.use(bodyParser.json());
 
-app.get('/', (req, res) => {
-  res.status(200).send("Welcome sire, you're authenticated and can thus view this message");
-});
+app.get('/protected', authMiddleware, async (req, res) => {
+  const allUsers = await userService.getUsers();
 
-/**
- * Contents for JWT:
- * `username`, `id`, `expiry`, `issuer`
- */
+  res.status(200).json(allUsers);
+});
 
 app.post('/register', async (req, res, next) => {
   try {
@@ -45,7 +43,7 @@ app.post('/register', async (req, res, next) => {
       });
     }
 
-    const jwt_ = createJwt({ userJwtPayload }, config.authSecret);
+    const jwt_ = createJwt(userJwtPayload, config.authSecret);
 
     res.status(200).json(jwt_);
   } catch (error) {
@@ -68,14 +66,13 @@ app.post('/login', async (req, res, next) => {
     const userJwtPayload = await userService.getUserForJWT(username);
 
     if (!userJwtPayload) {
-      // fix this error type, probs needs to be more generic since a row wasnt found, it doenst exist
       throw new AuthkunError({
         type: AuthkunErrorType.NoRowFound,
         message: `Error retrieving user: ${username}'s data from database`,
       });
     }
 
-    const jwt_ = createJwt({ userJwtPayload }, config.authSecret);
+    const jwt_ = createJwt(userJwtPayload, config.authSecret);
 
     return res.status(200).json(jwt_);
   } catch (error) {
@@ -83,5 +80,10 @@ app.post('/login', async (req, res, next) => {
   }
 });
 
+app.post('/logout', authMiddleware, (req, res) => {
+  return res.clearCookie('access_token').status(200).json('Successfully logged out!');
+});
+
 app.use(errorMiddleware);
+
 app.listen(PORT, () => console.log(`App listening on Port: ${PORT}`));

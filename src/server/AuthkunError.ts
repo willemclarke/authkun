@@ -7,14 +7,22 @@ export enum AuthkunErrorType {
   NoRowFound = 'NoRowFound',
 }
 
-export class AuthkunError extends Error {
+interface AuthkunArgs {
   type: AuthkunErrorType;
   message: string;
+  metadata?: Record<string, unknown>;
+}
 
-  constructor({ type, message }: { type: AuthkunErrorType; message: string }) {
+export class AuthkunError extends Error {
+  type: AuthkunArgs['type'];
+  message: AuthkunArgs['message'];
+  metadata?: AuthkunArgs['metadata'];
+
+  constructor(args: AuthkunArgs) {
     super();
-    this.type = type;
-    this.message = message;
+    this.type = args.type;
+    this.message = args.message;
+    this.metadata = args.metadata;
   }
 }
 

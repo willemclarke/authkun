@@ -19,6 +19,10 @@ export class UserService {
     return this.DatabaseService.getUser(username);
   }
 
+  async getUsers(): Promise<readonly PartialUser[]> {
+    return this.DatabaseService.getUsers();
+  }
+
   async register(username: string, password: string): Promise<void> {
     const { salt, hashedPassword } = hashAndSaltUserPassword(password);
     const createdAt = new Date();
@@ -28,6 +32,7 @@ export class UserService {
       throw new AuthkunError({
         type: AuthkunErrorType.UserAlreadyExists,
         message: `User already exists`,
+        metadata: { fields: { username: 'User already exists' } },
       });
     }
 

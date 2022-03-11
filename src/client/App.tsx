@@ -1,27 +1,11 @@
-import {
-  Box,
-  Button,
-  Flex,
-  FormControl,
-  FormLabel,
-  Heading,
-  HStack,
-  Input,
-} from '@chakra-ui/react';
+import React from 'react';
+import { Box, Flex } from '@chakra-ui/react';
 import { Signup } from './components/Signup';
 import { Link, Route, Routes } from 'react-router-dom';
 import { NoMatch } from './components/NoMatch';
 import { Home } from './components/Home';
-
-const Nav = () => {
-  return (
-    <Flex mt={4} mb={2} justify="center">
-      <Link to="/">
-        <Heading my="4">authkun</Heading>
-      </Link>
-    </Flex>
-  );
-};
+import { Logout } from './components/Logout';
+import { Nav } from './components/Nav';
 
 export const App = () => {
   return (
@@ -29,8 +13,9 @@ export const App = () => {
       <Nav />
       <Box h="100%">
         <Routes>
-          <Route index element={<Home />} />
+          <Route path="/" element={<Home />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/logout" element={<Logout />} />
           <Route path="*" element={<NoMatch />} />
         </Routes>
       </Box>

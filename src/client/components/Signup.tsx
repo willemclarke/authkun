@@ -3,6 +3,7 @@ import { Button, Flex, FormControl, FormErrorMessage, FormLabel, Input } from '@
 import { useForm } from 'react-hook-form';
 import { useSignupUser } from '../hooks/useSignupUser';
 import { useToast } from '../hooks/useToast';
+import { useNavigate } from 'react-router-dom';
 
 interface FormValues {
   username: string;
@@ -18,6 +19,7 @@ export const Signup = () => {
   } = useForm<FormValues>();
 
   const signupUserMutation = useSignupUser();
+  const navigate = useNavigate();
   const { successToast } = useToast();
 
   const onSubmit = React.useCallback(
@@ -26,16 +28,18 @@ export const Signup = () => {
         .mutateAsync({ ...values })
         .then((res) => {
           successToast('Successfully signed up!');
+          navigate('/');
           console.log(res);
         })
         .catch((err) => {
+          console.log(err.response.data);
           setError('username', {
             type: err.response.data.type,
             message: err.response.data.message,
           });
         });
     },
-    [signupUserMutation]
+    [signupUserMutation, successToast, setError]
   );
 
   return (
@@ -67,7 +71,7 @@ export const Signup = () => {
               {...register('password', {
                 required: true,
                 minLength: { value: 5, message: 'Password should be at least 5 characters long' },
-                maxLength: { value: 15, message: 'Password cannot exceed 20 characters' },
+                maxLength: { value: 20, message: 'Password cannot exceed 20 characters' },
               })}
             />
             <FormErrorMessage>{errors.password?.message}</FormErrorMessage>
