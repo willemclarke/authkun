@@ -7,7 +7,6 @@ const config: Config = fromEnv();
 
 export const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
   const authorization = req.headers['authorization'];
-  console.log({ authorization });
 
   if (!authorization) {
     throw new AuthkunError({ type: AuthkunErrorType.Unauthorised, message: 'Unauthorised' });
@@ -15,9 +14,8 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction) 
 
   try {
     const token = authorization.split(' ')[1];
-    console.log({ token });
-    const test = jwt.verify(token, config.authSecret);
-    console.log({ test });
+    const jwtPayload = jwt.verify(token, config.authSecret);
+    console.log({ jwtPayload });
   } catch (error) {
     throw new AuthkunError({
       type: AuthkunErrorType.Unauthorised,

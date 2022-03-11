@@ -13,7 +13,7 @@ import { AuthkunError, AuthkunErrorType } from './AuthkunError';
 const app = express();
 const config: Config = fromEnv();
 
-const PORT = 8080;
+const PORT = 4000;
 
 const pool = createPool(config.databaseUrl);
 const databaseService = new DatabaseService(pool);
@@ -43,9 +43,9 @@ app.post('/register', async (req, res, next) => {
       });
     }
 
-    const jwt_ = createJwt(userJwtPayload, config.authSecret);
+    const jwt = createJwt(userJwtPayload, config.authSecret);
 
-    res.status(200).json(jwt_);
+    res.status(200).json(jwt);
   } catch (error) {
     next(error);
   }
@@ -72,17 +72,16 @@ app.post('/login', async (req, res, next) => {
       });
     }
 
-    const jwt_ = createJwt(userJwtPayload, config.authSecret);
+    const jwt = createJwt(userJwtPayload, config.authSecret);
 
-    return res.status(200).json(jwt_);
+    return res.status(200).json(jwt);
   } catch (error) {
     next(error);
   }
 });
 
-app.post('/logout', authMiddleware, (req, res) => {
-  return res.clearCookie('access_token').status(200).json('Successfully logged out!');
-});
+// app.post('/logout', authMiddleware, (req, res) => {
+// });
 
 app.use(errorMiddleware);
 

@@ -4,6 +4,8 @@ import { useForm } from 'react-hook-form';
 import { useSignupUser } from '../hooks/useSignupUser';
 import { useToast } from '../hooks/useToast';
 import { useNavigate } from 'react-router-dom';
+import { useLocalStorage } from 'react-use';
+import { useAuth } from '../hooks/useAuth';
 
 interface FormValues {
   username: string;
@@ -18,18 +20,17 @@ export const Signup = () => {
     setError,
   } = useForm<FormValues>();
 
-  const signupUserMutation = useSignupUser();
+  const { signup, isAuthed } = useAuth();
   const navigate = useNavigate();
   const { successToast } = useToast();
 
   const onSubmit = React.useCallback(
     (values: FormValues) => {
-      signupUserMutation
-        .mutateAsync({ ...values })
-        .then((res) => {
+      signup
+        .signupAsync(values)
+        .then(() => {
           successToast('Successfully signed up!');
           navigate('/');
-          console.log(res);
         })
         .catch((err) => {
           console.log(err.response.data);
@@ -39,7 +40,7 @@ export const Signup = () => {
           });
         });
     },
-    [signupUserMutation, successToast, setError]
+    [signup, successToast, setError]
   );
 
   return (
@@ -76,13 +77,7 @@ export const Signup = () => {
             />
             <FormErrorMessage>{errors.password?.message}</FormErrorMessage>
           </FormControl>
-          <Button
-            my={2}
-            size="md"
-            colorScheme="orange"
-            type="submit"
-            isLoading={signupUserMutation.isLoading}
-          >
+          <Button my={2} size="md" colorScheme="orange" type="submit" isLoading={signup.isLoading}>
             Sign up
           </Button>
         </Flex>

@@ -3,7 +3,7 @@ import { useQuery } from 'react-query';
 import { PartialUser } from '../../server/services/database.service';
 
 const getUsers = async (): Promise<readonly PartialUser[]> => {
-  const { data } = await axios.get('/api/protected');
+  const { data } = await axios.get('http://localhost:4000/protected');
   return data;
 };
 

@@ -9,7 +9,7 @@ interface Variables {
 type JWT = string;
 
 const postUser = async (variables: Variables): Promise<JWT> => {
-  const { data } = await axios.post('/api/register', variables);
+  const { data } = await axios.post('http://localhost:4000/register', variables);
   return data;
 };
 
