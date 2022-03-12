@@ -15,7 +15,6 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction) 
   try {
     const token = authorization.split(' ')[1];
     const jwtPayload = jwt.verify(token, config.authSecret);
-    console.log({ jwtPayload });
   } catch (error) {
     throw new AuthkunError({
       type: AuthkunErrorType.Unauthorised,

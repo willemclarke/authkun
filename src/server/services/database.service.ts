@@ -1,6 +1,7 @@
 import { DatabasePool, sql, QueryResult } from 'slonik';
 import { dateTimeAsTimestamp } from './utils';
 import _ from 'lodash';
+import { User } from '../../common/types';
 
 export interface DatabaseUser {
   id: string;
@@ -8,11 +9,6 @@ export interface DatabaseUser {
   password: string;
   salt: string;
   createdAt: Date;
-}
-
-export interface PartialUser {
-  id: string;
-  username: string;
 }
 
 // TODO:
@@ -32,17 +28,17 @@ export class DatabaseService {
     });
   }
 
-  async getPartialUser(username: string): Promise<PartialUser | null> {
+  async getPartialUser(username: string): Promise<User | null> {
     return this.pool.connect((connection) => {
-      return connection.maybeOne<PartialUser>(
+      return connection.maybeOne<User>(
         sql`SELECT id, username FROM users WHERE username = ${username}`
       );
     });
   }
 
-  async getUsers(): Promise<readonly PartialUser[]> {
+  async getUsers(): Promise<readonly User[]> {
     return this.pool.connect(async (connection) => {
-      const { rows } = await connection.query<PartialUser>(sql`SELECT id, username FROM users`);
+      const { rows } = await connection.query<User>(sql`SELECT id, username FROM users`);
       return rows;
     });
   }

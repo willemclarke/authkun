@@ -1,24 +1,20 @@
 import React from 'react';
 import { useLocalStorage } from 'react-use';
+import { useLoginUser } from './useLoginUser';
 import { useSignupUser } from './useSignupUser';
 import decode from 'jwt-decode';
-import { Config } from '../../server/config/config';
+import { JwtToken } from '../../common/types';
 
 interface SignupRequest {
   username: string;
   password: string;
 }
 
-interface JwtToken {
-  exp: number;
-  iat: number;
-  id: string;
-  username: string;
-}
-
 export const useAuth = () => {
-  const [token, setToken] = useLocalStorage<string | undefined>('token');
+  const [token, setToken] = useLocalStorage<string>('token');
+
   const signupUserMutation = useSignupUser();
+  const loginUserMutation = useLoginUser();
 
   const signupAsync = React.useCallback(
     (request: SignupRequest) => {
@@ -34,8 +30,23 @@ export const useAuth = () => {
     signupAsync,
   };
 
-  const login = React.useCallback(() => {}, []);
-  const logout = React.useCallback(() => {}, []);
+  const loginAsync = React.useCallback(
+    (request: SignupRequest) => {
+      return loginUserMutation.mutateAsync(request).then((res) => {
+        setToken(res);
+      });
+    },
+    [loginUserMutation, setToken]
+  );
+
+  const login = {
+    ...loginAsync,
+    signupAsync,
+  };
+
+  const logout = React.useCallback(() => {
+    return setToken(undefined);
+  }, []);
 
   const isAuthed = React.useMemo(() => {
     if (!token) {
@@ -45,13 +56,11 @@ export const useAuth = () => {
     const payload = decode<JwtToken>(token);
     const now = new Date().valueOf() / 1000;
 
-    if (payload.exp < now) {
-      return true;
-    }
-    console.log({ now, payload });
+    const isExpired = payload.exp > now;
+    return isExpired;
   }, [token]);
 
-  const authToken = React.useMemo(() => {}, []);
+  const authToken = React.useMemo(() => token, [token]);
 
   return {
     signup,

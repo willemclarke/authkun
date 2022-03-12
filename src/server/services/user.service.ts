@@ -1,8 +1,9 @@
 import { hashAndSaltUserPassword, verifyPassword } from '../crypto';
-import { PartialUser, DatabaseService, DatabaseUser } from './database.service';
+import { DatabaseService, DatabaseUser } from './database.service';
 import { v4 as uuidv4 } from 'uuid';
 import _ from 'lodash';
 import { AuthkunError, AuthkunErrorType } from '../AuthkunError';
+import { User } from '../../common/types';
 
 export class UserService {
   DatabaseService: DatabaseService;
@@ -11,21 +12,19 @@ export class UserService {
     this.DatabaseService = databaseService;
   }
 
-  async getUserForJWT(username: string): Promise<PartialUser | null> {
-    return this.DatabaseService.getPartialUser(username);
-  }
-
   async getUser(username: string): Promise<DatabaseUser | null> {
     return this.DatabaseService.getUser(username);
   }
 
-  async getUsers(): Promise<readonly PartialUser[]> {
+  async getUserForJWT(username: string): Promise<User | null> {
+    return this.DatabaseService.getPartialUser(username);
+  }
+
+  async getUsers(): Promise<readonly User[]> {
     return this.DatabaseService.getUsers();
   }
 
   async register(username: string, password: string): Promise<void> {
-    const { salt, hashedPassword } = hashAndSaltUserPassword(password);
-    const createdAt = new Date();
     const userExists = await this.DatabaseService.userExists(username);
 
     if (userExists) {
@@ -35,6 +34,9 @@ export class UserService {
         metadata: { fields: { username: 'User already exists' } },
       });
     }
+
+    const { salt, hashedPassword } = hashAndSaltUserPassword(password);
+    const createdAt = new Date();
 
     this.DatabaseService.writeUser({
       id: uuidv4(),

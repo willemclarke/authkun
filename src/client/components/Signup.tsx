@@ -21,6 +21,7 @@ export const Signup = () => {
   } = useForm<FormValues>();
 
   const { signup, isAuthed } = useAuth();
+  console.log({ isAuthed });
   const navigate = useNavigate();
   const { successToast } = useToast();
 
