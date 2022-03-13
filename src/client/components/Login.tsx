@@ -3,7 +3,7 @@ import { Button, Flex, FormControl, FormErrorMessage, FormLabel, Input } from '@
 import { useForm } from 'react-hook-form';
 import { useToast } from '../hooks/useToast';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../hooks/useAuth';
+import { useAuthContext } from '../context/AuthContext';
 
 interface FormValues {
   username: string;
@@ -18,7 +18,7 @@ export const Login = () => {
     setError,
   } = useForm<FormValues>();
 
-  const { login, isAuthed } = useAuth();
+  const { login } = useAuthContext();
   const navigate = useNavigate();
   const { successToast } = useToast();
 
