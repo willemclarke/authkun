@@ -27,6 +27,9 @@ export class UserService {
   async register(username: string, password: string): Promise<void> {
     const userExists = await this.DatabaseService.userExists(username);
 
+    const { salt, hashedPassword } = hashAndSaltUserPassword(password);
+    const createdAt = new Date();
+
     if (userExists) {
       throw new AuthkunError({
         type: AuthkunErrorType.UserAlreadyExists,
@@ -34,9 +37,6 @@ export class UserService {
         metadata: { fields: { username: 'User already exists' } },
       });
     }
-
-    const { salt, hashedPassword } = hashAndSaltUserPassword(password);
-    const createdAt = new Date();
 
     this.DatabaseService.writeUser({
       id: uuidv4(),

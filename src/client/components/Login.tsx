@@ -10,7 +10,7 @@ interface FormValues {
   password: string;
 }
 
-export const Signup = () => {
+export const Login = () => {
   const {
     register,
     handleSubmit,
@@ -18,14 +18,14 @@ export const Signup = () => {
     setError,
   } = useForm<FormValues>();
 
-  const { signup, isAuthed } = useAuth();
+  const { login, isAuthed } = useAuth();
   const navigate = useNavigate();
   const { successToast } = useToast();
 
   const onSubmit = React.useCallback(
     (values: FormValues) => {
-      signup
-        .signupAsync(values)
+      login
+        .loginAsync(values)
         .then(() => {
           successToast('Successfully signed up!');
           navigate('/');
@@ -38,7 +38,7 @@ export const Signup = () => {
           });
         });
     },
-    [signup, successToast, setError]
+    [login, successToast, setError]
   );
 
   return (
@@ -55,8 +55,8 @@ export const Signup = () => {
               placeholder="username"
               {...register('username', {
                 required: true,
-                minLength: { value: 5, message: 'Username should be at least 5 characters long' },
-                maxLength: { value: 15, message: 'Username cannot exceed 15 characters' },
+                minLength: 5,
+                maxLength: 15,
               })}
             />
             <FormErrorMessage overflowX="clip">{errors.username?.message}</FormErrorMessage>
@@ -69,14 +69,14 @@ export const Signup = () => {
               placeholder="password"
               {...register('password', {
                 required: true,
-                minLength: { value: 5, message: 'Password should be at least 5 characters long' },
-                maxLength: { value: 20, message: 'Password cannot exceed 20 characters' },
+                minLength: 5,
+                maxLength: 15,
               })}
             />
             <FormErrorMessage>{errors.password?.message}</FormErrorMessage>
           </FormControl>
-          <Button my={2} size="md" colorScheme="orange" type="submit" isLoading={signup.isLoading}>
-            Sign up
+          <Button my={2} size="md" colorScheme="orange" type="submit" isLoading={login.isLoading}>
+            Login
           </Button>
         </Flex>
       </form>

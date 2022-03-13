@@ -59,7 +59,7 @@ app.post('/login', async (req, res, next) => {
     if (!isValidUser) {
       throw new AuthkunError({
         type: AuthkunErrorType.InvalidUserLogin,
-        message: `Failed to login user: ${username}. Ensure username and password are correct`,
+        message: `Error logging in, ensure username and password are correct`,
       });
     }
 
