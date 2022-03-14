@@ -13,9 +13,9 @@ export const Nav = () => {
     <>
       <LinkButton to="signup" label="Sign up" />
       <LinkButton to="login" label="Login" />
-      <LinkButton to="logout" label="Logout" onClick={logout} />
     </>
   );
+
   return (
     <Flex mt={4} mb={2} justify="center">
       <HStack spacing={4}>

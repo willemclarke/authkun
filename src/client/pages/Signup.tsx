@@ -28,7 +28,7 @@ export const Signup = () => {
         .signupAsync(values)
         .then(() => {
           successToast('Successfully signed up!');
-          navigate('/');
+          navigate('/', { replace: true });
         })
         .catch((err) => {
           console.log(err.response.data);

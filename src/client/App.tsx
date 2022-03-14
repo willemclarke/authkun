@@ -1,12 +1,12 @@
 import React from 'react';
 import { Box, Flex } from '@chakra-ui/react';
-import { Signup } from './components/Signup';
+import { Signup } from './pages/Signup';
 import { Route, Routes } from 'react-router-dom';
-import { NoMatch } from './components/NoMatch';
-import { Home } from './components/Home';
-import { Logout } from './components/Logout';
+import { NoMatch } from './pages/NoMatch';
+import { Home } from './pages/Home';
+import { Logout } from './pages/Logout';
 import { Nav } from './components/Nav';
-import { Login } from './components/Login';
+import { Login } from './pages/Login';
 import { GuardedRoute } from './components/GuardedRoute';
 
 export const App = () => {

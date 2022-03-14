@@ -1,6 +1,6 @@
 import React from 'react';
 import { Flex, Heading, VStack } from '@chakra-ui/react';
-import { LinkButton } from './LinkButton';
+import { LinkButton } from '../components/LinkButton';
 import { CheckCircleIcon } from '@chakra-ui/icons';
 
 export const Logout = () => {

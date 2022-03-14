@@ -27,8 +27,8 @@ export const Login = () => {
       login
         .loginAsync(values)
         .then(() => {
-          successToast('Successfully signed up!');
-          navigate('/');
+          successToast('Successfully logged in!');
+          navigate('/', { replace: true });
         })
         .catch((err) => {
           console.log(err.response.data);

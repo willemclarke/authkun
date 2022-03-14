@@ -1,11 +1,9 @@
 import React from 'react';
 import { Center, Tag, Flex, HStack, List, ListItem, Spinner } from '@chakra-ui/react';
 import { useGetUsers } from '../hooks/useGetUsers';
-import { useAuthContext } from '../context/AuthContext';
 
 export const Home = () => {
-  const { authToken } = useAuthContext();
-  const { data, isLoading, error } = useGetUsers(authToken);
+  const { data, isLoading, error } = useGetUsers();
 
   if (isLoading) {
     return (

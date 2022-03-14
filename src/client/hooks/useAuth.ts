@@ -4,6 +4,7 @@ import { useLoginUser } from './useLoginUser';
 import { useSignupUser } from './useSignupUser';
 import decode from 'jwt-decode';
 import { JwtToken } from '../../common/types';
+import _ from 'lodash';
 
 interface Request {
   username: string;
@@ -59,13 +60,11 @@ export const useAuth = () => {
     return isExpired;
   }, [token]);
 
-  const authToken = React.useMemo(() => token, [token]);
-
   return {
     signup,
     login,
     logout,
     isAuthenticated,
-    authToken,
+    authToken: token,
   };
 };

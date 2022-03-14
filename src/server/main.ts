@@ -35,7 +35,6 @@ app.get('/protected', authMiddleware, async (req, res, next) => {
 app.post('/register', async (req, res, next) => {
   try {
     const { username, password } = req.body;
-    console.log({ username, password });
 
     await userService.register(username, password);
     const userJwtPayload = await userService.getUserForJWT(username);
