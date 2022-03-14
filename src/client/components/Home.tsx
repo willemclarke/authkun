@@ -1,25 +1,40 @@
 import React from 'react';
-import { Box, Button, Flex, Heading, HStack, Spinner, VStack } from '@chakra-ui/react';
+import { Center, Tag, Flex, HStack, List, ListItem, Spinner } from '@chakra-ui/react';
 import { useGetUsers } from '../hooks/useGetUsers';
+import { useAuthContext } from '../context/AuthContext';
 
 export const Home = () => {
-  // const { data, isLoading, error } = useGetUsers();
+  const { authToken } = useAuthContext();
+  const { data, isLoading, error } = useGetUsers(authToken);
 
-  // if (isLoading) {
-  //   return <Spinner />;
-  // }
+  if (isLoading) {
+    return (
+      <Center>
+        <Spinner />
+      </Center>
+    );
+  }
 
-  // if (error || !data) {
-  //   console.log({ error });
-  //   return <div>{JSON.stringify(error, null, 2)}</div>;
-  // }
+  if (error || !data) {
+    return <div>{JSON.stringify(error, null, 2)}</div>;
+  }
+
+  const users = data.map((user, index) => {
+    return (
+      <ListItem key={index}>
+        <HStack spacing={4} my={2}>
+          <Tag colorScheme="orange" variant="outline">
+            {user.username}
+          </Tag>
+          <Tag variant="outline">{user.id}</Tag>
+        </HStack>
+      </ListItem>
+    );
+  });
 
   return (
     <Flex my={4} justify="center">
-      <VStack spacing={4}>
-        <Heading size="md">Currently viewing the homepage</Heading>
-      </VStack>
-      {/* <Box>{JSON.stringify(data, null, 2)}</Box> */}
+      <List>{users}</List>
     </Flex>
   );
 };

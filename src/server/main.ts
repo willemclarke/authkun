@@ -22,10 +22,14 @@ const userService = new UserService(databaseService);
 app.use(cors());
 app.use(bodyParser.json());
 
-app.get('/protected', authMiddleware, async (req, res) => {
-  const allUsers = await userService.getUsers();
+app.get('/protected', authMiddleware, async (req, res, next) => {
+  try {
+    const allUsers = await userService.getUsers();
 
-  res.status(200).json(allUsers);
+    res.status(200).json(allUsers);
+  } catch (error) {
+    next(error);
+  }
 });
 
 app.post('/register', async (req, res, next) => {
@@ -79,9 +83,6 @@ app.post('/login', async (req, res, next) => {
     next(error);
   }
 });
-
-// app.post('/logout', authMiddleware, (req, res) => {
-// });
 
 app.use(errorMiddleware);
 

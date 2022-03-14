@@ -46,7 +46,7 @@ export const useAuth = () => {
 
   const logout = React.useCallback(() => remove(), [remove]);
 
-  const isAuthed = React.useMemo(() => {
+  const isAuthenticated = React.useMemo(() => {
     if (!token) {
       return false;
     }
@@ -65,7 +65,7 @@ export const useAuth = () => {
     signup,
     login,
     logout,
-    isAuthed,
+    isAuthenticated,
     authToken,
   };
 };

@@ -18,8 +18,8 @@ export const Signup = () => {
     setError,
   } = useForm<FormValues>();
 
-  const { signup } = useAuthContext();
   const navigate = useNavigate();
+  const { signup } = useAuthContext();
   const { successToast } = useToast();
 
   const onSubmit = React.useCallback(

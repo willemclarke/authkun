@@ -7,6 +7,7 @@ import { Home } from './components/Home';
 import { Logout } from './components/Logout';
 import { Nav } from './components/Nav';
 import { Login } from './components/Login';
+import { GuardedRoute } from './components/GuardedRoute';
 
 export const App = () => {
   return (
@@ -14,7 +15,14 @@ export const App = () => {
       <Nav />
       <Box h="100%">
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route
+            path="/"
+            element={
+              <GuardedRoute>
+                <Home />
+              </GuardedRoute>
+            }
+          />
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />
           <Route path="/logout" element={<Logout />} />
