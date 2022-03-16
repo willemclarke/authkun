@@ -1,4 +1,4 @@
-export enum AuthkunErrorType {
+export enum AuthkunErrors {
   UserAlreadyExists = 'UserAlreadyExists',
   Unauthorised = 'Unauthorised',
   InternalServerError = 'InternalServerError',
@@ -6,19 +6,22 @@ export enum AuthkunErrorType {
   InvalidUserLogin = 'InvalidUserLogin',
   NoRowFound = 'NoRowFound',
 }
+interface Metadata {
+  fields: Record<string, unknown>;
+}
 
-interface AuthkunArgs {
-  type: AuthkunErrorType;
+interface AuthkunErrorType {
+  type: AuthkunErrors;
   message: string;
-  metadata?: Record<string, unknown>;
+  metadata?: Metadata;
 }
 
 export class AuthkunError extends Error {
-  type: AuthkunArgs['type'];
-  message: AuthkunArgs['message'];
-  metadata?: AuthkunArgs['metadata'];
+  type: AuthkunErrorType['type'];
+  message: AuthkunErrorType['message'];
+  metadata?: AuthkunErrorType['metadata'];
 
-  constructor(args: AuthkunArgs) {
+  constructor(args: AuthkunErrorType) {
     super();
     this.type = args.type;
     this.message = args.message;
@@ -26,18 +29,18 @@ export class AuthkunError extends Error {
   }
 }
 
-export const errorTypeToStatusCode = (type: AuthkunErrorType) => {
+export const errorTypeToStatusCode = (type: AuthkunErrors) => {
   switch (type) {
-    case AuthkunErrorType.NoRowFound:
+    case AuthkunErrors.NoRowFound:
       return 400;
-    case AuthkunErrorType.Unauthorised:
+    case AuthkunErrors.Unauthorised:
       return 401;
-    case AuthkunErrorType.InvalidUserLogin:
+    case AuthkunErrors.InvalidUserLogin:
       return 403;
-    case AuthkunErrorType.UserAlreadyExists:
+    case AuthkunErrors.UserAlreadyExists:
       return 409;
-    case AuthkunErrorType.InternalServerError:
-    case AuthkunErrorType.UnknownErrorOccured:
+    case AuthkunErrors.InternalServerError:
+    case AuthkunErrors.UnknownErrorOccured:
       return 500;
   }
 };

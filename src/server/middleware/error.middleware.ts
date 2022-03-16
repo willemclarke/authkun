@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { AuthkunError, AuthkunErrorType, errorTypeToStatusCode } from '../AuthkunError';
+import { AuthkunError, AuthkunErrors, errorTypeToStatusCode } from '../AuthkunError';
 
 export const isAuthkunError = (error: Error | AuthkunError) => error instanceof AuthkunError;
 
@@ -11,7 +11,7 @@ export const errorMiddleware = (
 ) => {
   if (!isAuthkunError(error)) {
     error = new AuthkunError({
-      type: AuthkunErrorType.InternalServerError,
+      type: AuthkunErrors.InternalServerError,
       message: error.message,
     });
   }

@@ -2,7 +2,7 @@ import { hashAndSaltUserPassword, verifyPassword } from '../crypto';
 import { DatabaseService, DatabaseUser } from './database.service';
 import { v4 as uuidv4 } from 'uuid';
 import _ from 'lodash';
-import { AuthkunError, AuthkunErrorType } from '../AuthkunError';
+import { AuthkunError, AuthkunErrors } from '../AuthkunError';
 import { User } from '../../common/types';
 
 export class UserService {
@@ -32,7 +32,7 @@ export class UserService {
 
     if (userExists) {
       throw new AuthkunError({
-        type: AuthkunErrorType.UserAlreadyExists,
+        type: AuthkunErrors.UserAlreadyExists,
         message: `User already exists`,
         metadata: { fields: { username: 'User already exists' } },
       });
