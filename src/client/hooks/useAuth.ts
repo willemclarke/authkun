@@ -47,7 +47,7 @@ export const useAuth = () => {
 
   const logout = React.useCallback(() => remove(), [remove]);
 
-  const isAuthenticated = React.useMemo(() => {
+  const isAuthenticated = React.useCallback(() => {
     if (!token) {
       return false;
     }

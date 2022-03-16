@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import { useToast } from '../hooks/useToast';
 import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../context/AuthContext';
+import { AxiosError } from 'axios';
 
 interface FormValues {
   username: string;
@@ -30,16 +31,28 @@ export const Signup = () => {
           successToast('Successfully signed up!');
           navigate('/', { replace: true });
         })
-        .catch((err) => {
-          console.log(err.response.data);
+        .catch((err: AxiosError) => {
+          console.log({ err });
+          // parseServerErrors(err, setError);
           setError('username', {
-            type: err.response.data.type,
-            message: err.response.data.message,
+            type: err.response?.data.type,
+            message: err.response?.data.message,
           });
         });
     },
     [signup, successToast, setError]
   );
+
+  // const parseServerErrors = (error: Record<string, any>, setError_: typeof setError) => {
+  //   const errors = error.response?.data?.metadata?.fields;
+
+  //   return Object.keys(errors).forEach((key) => {
+  //     return setError_(key as keyof FormValues, {
+  //       type: 'server',
+  //       message: errors[key],
+  //     });
+  //   });
+  // };
 
   return (
     <Flex justify="center" mt={4}>

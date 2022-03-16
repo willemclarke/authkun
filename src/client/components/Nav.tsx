@@ -7,7 +7,7 @@ import { useAuthContext } from '../context/AuthContext';
 export const Nav = () => {
   const { isAuthenticated, logout } = useAuthContext();
 
-  const content = isAuthenticated ? (
+  const content = isAuthenticated() ? (
     <LinkButton to="logout" label="Logout" onClick={logout} />
   ) : (
     <>

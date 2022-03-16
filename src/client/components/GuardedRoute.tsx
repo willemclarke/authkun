@@ -6,7 +6,7 @@ export const GuardedRoute = ({ children }: { children: JSX.Element }) => {
   const location = useLocation();
   const { isAuthenticated } = useAuthContext();
 
-  if (!isAuthenticated) {
+  if (!isAuthenticated()) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 

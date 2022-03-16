@@ -36,6 +36,7 @@ export const Login = () => {
             type: err.response.data.type,
             message: err.response.data.message,
           });
+          console.log({ errors });
         });
     },
     [login, successToast, setError]

@@ -12,7 +12,7 @@ export const createJwt = (
   token: Secret,
   options?: SignOptions
 ) => {
-  return jwt.sign(payload, token, { ...options, expiresIn: '16h' });
+  return jwt.sign(payload, token, { ...options, expiresIn: '30s' });
 };
 
 // cryptography
