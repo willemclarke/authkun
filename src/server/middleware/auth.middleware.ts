@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { AuthkunError, AuthkunErrorType } from '../AuthkunError';
+import { AuthkunError, AuthkunErrors } from '../AuthkunError';
 import { fromEnv, Config } from '../config/config';
 import jwt from 'jsonwebtoken';
 
@@ -9,7 +9,7 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction) 
   const authorization = req.headers['authorization'];
 
   if (!authorization) {
-    throw new AuthkunError({ type: AuthkunErrorType.Unauthorised, message: 'Unauthorised' });
+    throw new AuthkunError({ type: AuthkunErrors.Unauthorised, message: 'Unauthorised' });
   }
 
   try {
@@ -17,7 +17,7 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction) 
     const jwtPayload = jwt.verify(token, config.authSecret);
   } catch (error) {
     throw new AuthkunError({
-      type: AuthkunErrorType.Unauthorised,
+      type: AuthkunErrors.Unauthorised,
       message: error instanceof Error ? error.message : 'Unauthorised',
     });
   }

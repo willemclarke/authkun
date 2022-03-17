@@ -8,7 +8,7 @@ import { UserService } from './services/user.service';
 import { createJwt } from './crypto';
 import { errorMiddleware } from './middleware/error.middleware';
 import { authMiddleware } from './middleware/auth.middleware';
-import { AuthkunError, AuthkunErrorType } from './AuthkunError';
+import { AuthkunError, AuthkunErrors } from './AuthkunError';
 
 const app = express();
 const config: Config = fromEnv();
@@ -41,7 +41,7 @@ app.post('/register', async (req, res, next) => {
 
     if (!userJwtPayload) {
       throw new AuthkunError({
-        type: AuthkunErrorType.NoRowFound,
+        type: AuthkunErrors.NoRowFound,
         message: `Error retrieving user: ${username}'s data from database`,
       });
     }
@@ -61,16 +61,23 @@ app.post('/login', async (req, res, next) => {
 
     if (!isValidUser) {
       throw new AuthkunError({
-        type: AuthkunErrorType.InvalidUserLogin,
-        message: `Error logging in, ensure username and password are correct`,
+        type: AuthkunErrors.InvalidUserLogin,
+        message: `Inalid credentials, ensure username and password are correct`,
+        metadata: {
+          fields: {
+            username: 'Ensure username is correct',
+            password: 'Ensure password is correct',
+          },
+        },
       });
     }
 
     const userJwtPayload = await userService.getUserForJWT(username);
 
     if (!userJwtPayload) {
+      // Once I have withConn function this error can go
       throw new AuthkunError({
-        type: AuthkunErrorType.NoRowFound,
+        type: AuthkunErrors.NoRowFound,
         message: `Error retrieving user: ${username}'s data from database`,
       });
     }

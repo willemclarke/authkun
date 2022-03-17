@@ -5,6 +5,7 @@ import { useToast } from '../hooks/useToast';
 import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../context/AuthContext';
 import { AxiosError } from 'axios';
+import { parseServerFieldErrors } from '../utils/utils';
 
 interface FormValues {
   username: string;
@@ -32,27 +33,11 @@ export const Signup = () => {
           navigate('/', { replace: true });
         })
         .catch((err: AxiosError) => {
-          console.log({ err });
-          // parseServerErrors(err, setError);
-          setError('username', {
-            type: err.response?.data.type,
-            message: err.response?.data.message,
-          });
+          parseServerFieldErrors<FormValues>(err, setError);
         });
     },
-    [signup, successToast, setError]
+    [signup, successToast, parseServerFieldErrors, setError]
   );
-
-  // const parseServerErrors = (error: Record<string, any>, setError_: typeof setError) => {
-  //   const errors = error.response?.data?.metadata?.fields;
-
-  //   return Object.keys(errors).forEach((key) => {
-  //     return setError_(key as keyof FormValues, {
-  //       type: 'server',
-  //       message: errors[key],
-  //     });
-  //   });
-  // };
 
   return (
     <Flex justify="center" mt={4}>

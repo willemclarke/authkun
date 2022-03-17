@@ -4,6 +4,8 @@ import { useForm } from 'react-hook-form';
 import { useToast } from '../hooks/useToast';
 import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../context/AuthContext';
+import { AxiosError } from 'axios';
+import { parseServerFieldErrors } from '../utils/utils';
 
 interface FormValues {
   username: string;
@@ -30,16 +32,11 @@ export const Login = () => {
           successToast('Successfully logged in!');
           navigate('/', { replace: true });
         })
-        .catch((err) => {
-          console.log(err.response.data);
-          setError('username', {
-            type: err.response.data.type,
-            message: err.response.data.message,
-          });
-          console.log({ errors });
+        .catch((err: AxiosError) => {
+          parseServerFieldErrors<FormValues>(err, setError);
         });
     },
-    [login, successToast, setError]
+    [login, successToast, parseServerFieldErrors, setError]
   );
 
   return (
