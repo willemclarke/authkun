@@ -62,7 +62,7 @@ app.post('/login', async (req, res, next) => {
     if (!isValidUser) {
       throw new AuthkunError({
         type: AuthkunErrors.InvalidUserLogin,
-        message: `Inalid credentials, ensure username and password are correct`,
+        message: `Invalid credentials, ensure username and password are correct`,
         metadata: {
           fields: {
             username: 'Ensure username is correct',

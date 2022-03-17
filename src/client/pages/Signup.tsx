@@ -6,11 +6,21 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../context/AuthContext';
 import { AxiosError } from 'axios';
 import { parseServerFieldErrors } from '../utils/utils';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
 
 interface FormValues {
   username: string;
   password: string;
 }
+
+const schema = yup
+  .object()
+  .shape({
+    username: yup.string().min(5).max(15).required(),
+    password: yup.string().min(5).max(20).required(),
+  })
+  .required();
 
 export const Signup = () => {
   const {
@@ -18,7 +28,7 @@ export const Signup = () => {
     handleSubmit,
     formState: { errors },
     setError,
-  } = useForm<FormValues>();
+  } = useForm<FormValues>({ resolver: yupResolver(schema) });
 
   const navigate = useNavigate();
   const { signup } = useAuthContext();
@@ -47,30 +57,12 @@ export const Signup = () => {
             <FormLabel my={1} htmlFor="username" fontWeight="bold">
               Username
             </FormLabel>
-            <Input
-              my={1}
-              id="username"
-              placeholder="username"
-              {...register('username', {
-                required: true,
-                minLength: { value: 5, message: 'Username should be at least 5 characters long' },
-                maxLength: { value: 15, message: 'Username cannot exceed 15 characters' },
-              })}
-            />
-            <FormErrorMessage overflowX="clip">{errors.username?.message}</FormErrorMessage>
+            <Input my={1} id="username" placeholder="username" {...register('username')} />
+            <FormErrorMessage>{errors.username?.message}</FormErrorMessage>
             <FormLabel my={1} htmlFor="password" fontWeight="bold">
               Password
             </FormLabel>
-            <Input
-              my={1}
-              id="password"
-              placeholder="password"
-              {...register('password', {
-                required: true,
-                minLength: { value: 5, message: 'Password should be at least 5 characters long' },
-                maxLength: { value: 20, message: 'Password cannot exceed 20 characters' },
-              })}
-            />
+            <Input my={1} id="password" placeholder="password" {...register('password')} />
             <FormErrorMessage>{errors.password?.message}</FormErrorMessage>
           </FormControl>
           <Button my={2} size="md" colorScheme="orange" type="submit" isLoading={signup.isLoading}>
